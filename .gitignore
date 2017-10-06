@@ -4,3 +4,4 @@ pkg
 .bundle
 .pairs
 Gemfile.lock
+.byebug_history

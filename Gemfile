@@ -14,3 +14,4 @@ group :development do
 end
 
 gem "codeclimate-test-reporter", group: :test, require: nil, github: "codeclimate/ruby-test-reporter"
+gem 'byebug', group: [:test, :development], require: false
