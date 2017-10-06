@@ -23,7 +23,8 @@ describe Oink::Middleware do
 
   let(:log_output)  { StringIO.new }
   let(:logger)      { Hodel3000CompliantLogger.new(log_output) }
-  let(:app)         { Oink::Middleware.new(SampleApplication.new, :logger => logger) }
+  let(:app)         { Oink::Middleware.new(SampleApplication.new, oink_configuration.merge(:logger => logger)) }
+  let(:oink_configuration) { @oink_configuration || {} }
 
   before do
     Oink::Instrumentation::MemorySnapshot.stub(:memory => 4092)
@@ -55,6 +56,17 @@ describe Oink::Middleware do
     it "logs the action and controller within a module" do
       get "/no_pigs", {}, {'action_dispatch.request.parameters' => {'controller' => 'oinkoink/admin', 'action' => 'piggie'}}
       log_output.string.should include("Oink Action: oinkoink/admin#piggie")
+    end
+  end
+
+  context 'support displaying request url in oink logs' do
+    before do
+      @oink_configuration = { request_url: true }
+    end
+
+    it "logs the request url in rails 3.x when request_url option is true" do
+      get "/no_pigs", {query: :param}, {'action_dispatch.request.parameters' => {'controller' => 'oinkoink', 'action' => 'piggie'}}
+      log_output.string.should include("Oink Url: /no_pigs?query=param")
     end
   end
 

@@ -7,6 +7,7 @@ module Oink
 
     def initialize(app, options = {})
       @app         = app
+      @request_url = options[:request_url] || false
       @logger      = options[:logger] || Hodel3000CompliantLogger.new("log/oink.log")
       @instruments = options[:instruments] ? Array(options[:instruments]) : [:memory, :activerecord]
 
@@ -33,6 +34,7 @@ module Oink
         controller = routing_info['controller']
         action     = routing_info['action']
         @logger.info("Oink Action: #{controller}##{action}")
+        @logger.info("Oink Url: #{request_info(env)}") if @request_url
       end
     end
 
@@ -66,5 +68,8 @@ module Oink
       ActiveRecord::Base.reset_instance_type_count
     end
 
+    def request_info(env)
+      env['REQUEST_URI'] || "#{ env['PATH_INFO'] }?#{ env['QUERY_STRING'] }"
+    end
   end
 end
